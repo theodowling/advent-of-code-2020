@@ -6,7 +6,7 @@ defmodule AdventOfCode.Day01 do
   """
   def part1(args) do
     numbers = parse_input_lines_to_list_of_integers(args)
-    [a | rest] = numbers
+    [a | rest] = numbers |> Enum.sort()
     {a, b} = find_combination(a, rest, numbers)
     a * b
   end
