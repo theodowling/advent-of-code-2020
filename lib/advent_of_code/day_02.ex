@@ -22,7 +22,7 @@ defmodule AdventOfCode.Day02 do
   def parse_rule(line) do
     case Regex.run(~r/^(?<a>\d{1,})-(?<b>\d{1,})\s(?<c>.):\s(?<password>\S{1,})$/, line) do
       [_, a, b, c, password] ->
-        {String.to_integer(a), String.to_integer(b), c, String.split(password, "", trim: true)}
+        {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
 
       _ ->
         raise("invalid regex #{line}")
@@ -31,18 +31,14 @@ defmodule AdventOfCode.Day02 do
 
   def check_password({a, b, c, password}, :count) do
     number = count_chars(password, c)
-    a <= number and number <= b
+    a <= number && number <= b
   end
 
   def check_password({a, b, c, password}, :position) do
     n1 = Enum.at(password, a - 1) == c
     n2 = Enum.at(password, b - 1) == c
 
-    if n1 || n2 do
-      not (n1 and n2)
-    else
-      false
-    end
+    (n1 || n2) && n1 != n2
   end
 
   def count_chars(password, c) do
