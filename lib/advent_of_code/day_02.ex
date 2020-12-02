@@ -20,13 +20,11 @@ defmodule AdventOfCode.Day02 do
   end
 
   def parse_rule(line) do
-    case Regex.run(~r/^(?<a>\d{1,})-(?<b>\d{1,})\s(?<c>.):\s(?<password>\S{1,})$/, line) do
-      [_, a, b, c, password] ->
-        {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
+    [rule, password] = String.split(line, ": ")
+    [rule, c] = String.split(rule, " ")
+    [a, b] = String.split(rule, "-")
 
-      _ ->
-        raise("invalid regex #{line}")
-    end
+    {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
   end
 
   def check_password({a, b, c, password}, :count) do
