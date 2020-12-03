@@ -1,6 +1,7 @@
 defmodule AdventOfCode.Day01 do
   import AdventOfCode.Utils
 
+  @spec part1(binary) :: number
   @doc """
   Find the two entries that sum to 2020 and then multiply those two numbers together.
   """
@@ -11,6 +12,7 @@ defmodule AdventOfCode.Day01 do
     a * b
   end
 
+  @spec part2(binary) :: number
   def part2(args) do
     numbers = parse_input_lines_to_list_of_integers(args)
     [a | rest] = numbers
@@ -18,6 +20,7 @@ defmodule AdventOfCode.Day01 do
     a * b * c
   end
 
+  @spec find_combination(any, any, any) :: :not_found | {any, any}
   def find_combination(a, rest, numbers) do
     case Enum.find(numbers, fn x -> a + x == 2_020 end) do
       nil ->
@@ -33,6 +36,7 @@ defmodule AdventOfCode.Day01 do
     end
   end
 
+  @spec find_combination_three_way(any, any, any) :: any
   def find_combination_three_way(a, rest, numbers) do
     case Enum.find_value(numbers, &sum_values(a, &1, numbers)) do
       nil ->
@@ -48,6 +52,7 @@ defmodule AdventOfCode.Day01 do
     end
   end
 
+  @spec sum_values(number, number, any) :: nil | {number, number, number}
   def sum_values(a, b, number) do
     if a + b > 2020 do
       nil
