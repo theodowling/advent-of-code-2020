@@ -335,7 +335,7 @@ defmodule Mix.Tasks.D03.P2 do
     y = 323
 
     if Enum.member?(args, "-b"),
-      do: Benchee.run(%{part_1: fn -> input |> part2(x, y) end}),
+      do: Benchee.run(%{part_2: fn -> input |> part2(x, y) end}),
       else:
         input
         |> part2(x, y)

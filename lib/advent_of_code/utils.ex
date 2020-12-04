@@ -19,8 +19,10 @@ defmodule AdventOfCode.Utils do
       |> Enum.reduce({MapSet.new(), 1}, fn item, {coords, n} ->
         coords =
           if item == val || val == :all do
-            x1 = if rem(n, x) != 0, do: rem(n, x), else: x
-            y1 = if rem(n, x) != 0, do: div(n, x) + 1, else: div(n, x)
+            r = rem(n, x)
+            d = div(n, x)
+            x1 = if r != 0, do: r, else: x
+            y1 = if r != 0, do: d + 1, else: d
             MapSet.put(coords, {x1, y1})
           else
             coords

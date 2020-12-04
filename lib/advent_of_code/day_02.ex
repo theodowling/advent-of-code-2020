@@ -24,11 +24,14 @@ defmodule AdventOfCode.Day02 do
 
   @spec parse_rule(binary) :: {integer, integer, binary, [binary]}
   def parse_rule(line) do
-    [rule, password] = String.split(line, ": ")
-    [rule, c] = String.split(rule, " ")
-    [a, b] = String.split(rule, "-")
-
-    {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
+    case line do
+      <<a::binary-size(2), "-", b::binary-size(2), " ", c::binary-size(1), ": ",  password::binary>> ->
+        {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
+      <<a::binary-size(1), "-", b::binary-size(2), " ", c::binary-size(1), ": ",  password::binary>> ->
+        {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
+      <<a::binary-size(1), "-", b::binary-size(1), " ", c::binary-size(1), ": ",  password::binary>> ->
+        {String.to_integer(a), String.to_integer(b), c, String.codepoints(password)}
+    end
   end
 
   @spec check_password({any, any, any, any}, :count | :position) :: boolean
