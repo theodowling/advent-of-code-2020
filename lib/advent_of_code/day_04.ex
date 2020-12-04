@@ -12,6 +12,7 @@ defmodule AdventOfCode.Day04 do
   #   :cid
   # ]
 
+  @spec part1(binary) :: non_neg_integer
   def part1(input_path) do
     input_path
     |> chunck_and_trim_passports()
@@ -21,6 +22,7 @@ defmodule AdventOfCode.Day04 do
     |> Enum.count()
   end
 
+  @spec part2(binary) :: non_neg_integer
   def part2(input_path) do
     input_path
     |> chunck_and_trim_passports()
@@ -30,6 +32,7 @@ defmodule AdventOfCode.Day04 do
     |> Enum.count(&(&1 == true))
   end
 
+  @spec chunck_and_trim_passports(binary) :: Stream.t()
   def chunck_and_trim_passports(input_path) do
     chunk_fun = fn element, acc ->
       if element == "" do
@@ -51,6 +54,7 @@ defmodule AdventOfCode.Day04 do
     |> Stream.map(&Enum.join(&1, " "))
     |> Stream.map(&String.trim/1)
   end
+  @spec get_keys(binary) :: MapSet.t(any)
   def get_keys(code) do
     code
     |> String.split(" ")
@@ -60,15 +64,18 @@ defmodule AdventOfCode.Day04 do
     |> MapSet.new()
   end
 
+  @spec get_key_values(binary) :: [binary]
   def get_key_values(code) do
     code
     |> String.split(" ")
   end
 
+  @spec missing_keys(MapSet.t(any), [atom()]) :: boolean
   def missing_keys(a, required) do
     Enum.any?(required, fn x -> !MapSet.member?(a, x) end)
   end
 
+  @spec has_missing_items([binary()], [atom()]) :: boolean
   def has_missing_items(item, required \\ @required_params) do
     mapset =
       item
@@ -78,6 +85,7 @@ defmodule AdventOfCode.Day04 do
     Enum.any?(required, &!MapSet.member?(mapset, &1))
   end
 
+  @spec invalid_entry(binary()) :: boolean
   def invalid_entry(<<"byr:", value::binary>>) do
     date = String.to_integer(value)
     date < 1920 || date > 2002
