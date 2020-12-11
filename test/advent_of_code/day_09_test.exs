@@ -3,19 +3,19 @@ defmodule AdventOfCode.Day09Test do
 
   import AdventOfCode.Day09
 
-  @tag :skip
+  # @tag :skip
   test "part1" do
-    input = nil
-    result = part1(input)
+    input = "priv/sample/day09.txt"
+    result = part1(input, 5)
 
-    assert result
+    assert result == 127
   end
 
-  @tag :skip
+  # @tag :skip
   test "part2" do
-    input = nil
-    result = part2(input)
+    input = "priv/sample/day09.txt"
+    result = part2(input, 127)
 
-    assert result
+    assert result == 62
   end
 end
