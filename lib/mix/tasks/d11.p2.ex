@@ -5,13 +5,13 @@ defmodule Mix.Tasks.D11.P2 do
 
   @shortdoc "Day 11 Part 2"
   def run(args) do
-    input = nil
+    input = "priv/input/day11.txt"
 
     if Enum.member?(args, "-b"),
-      do: Benchee.run(%{part_2: fn -> input |> part2() end}),
+      do: Benchee.run(%{part_2: fn -> input |> part2(96, 90) end}),
       else:
         input
-        |> part2()
+        |> part2(96, 90)
         |> IO.inspect(label: "Part 2 Results")
   end
 end

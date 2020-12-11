@@ -33,4 +33,26 @@ defmodule AdventOfCode.Utils do
 
     coords
   end
+
+  def parse_stream_to_coordinate_map(input, x, y) do
+    check = x * y + 1
+
+    {coords, ^check} =
+      input
+      |> Stream.map(&String.replace(&1, "\n", ""))
+      |> Stream.map(&String.codepoints(&1))
+      |> Enum.to_list()
+      |> List.flatten()
+      |> Enum.reduce({Map.new(), 1}, fn item, {coords, n} ->
+        r = rem(n, x)
+        d = div(n, x)
+        x1 = if r != 0, do: r, else: x
+        y1 = if r != 0, do: d + 1, else: d
+        coords = Map.put(coords, {x1, y1}, String.to_atom(item))
+
+        {coords, n + 1}
+      end)
+
+    Enum.into(coords, %{})
+  end
 end
