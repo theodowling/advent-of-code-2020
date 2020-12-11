@@ -65,7 +65,7 @@ defmodule AdventOfCode.Day08 do
     end
   end
 
-  def valid_program?(program, pos \\ 0, acc \\ 0, _steps \\ %MapSet{})
+  def valid_program?(program, pos \\ 0, acc \\ 0, steps \\ %MapSet{})
   def valid_program?(program, pos, acc, _steps) when pos > map_size(program) - 1, do: acc
 
   def valid_program?(program, pos, acc, steps) do
