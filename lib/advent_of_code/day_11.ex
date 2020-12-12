@@ -1,90 +1,146 @@
 defmodule AdventOfCode.Day11 do
-  import AdventOfCode.Utils
-
   def part1(input, x_max, y_max) do
     input
-    |> File.stream!()
-    |> parse_stream_to_coordinate_map(x_max, y_max)
-    |> part_1_iterate_until_repeating(x_max, y_max)
-    |> Enum.count(fn {_, v} ->
-      v == :O
-    end)
+    |> File.read!()
+    |> parse_input_to_coordinate_mapset(x_max, y_max)
+    |> part_1_iterate_until_repeating(MapSet.new(), x_max, y_max)
+    |> MapSet.size()
   end
 
   def part2(input, x_max, y_max) do
     input
-    |> File.stream!()
-    |> parse_stream_to_coordinate_map(x_max, y_max)
+    |> File.read!()
+    |> parse_input_to_coordinate_mapset(x_max, y_max)
+    |> part_2_iterate_until_repeating(MapSet.new(), x_max, y_max)
   end
 
-  def part_1_iterate_until_repeating(m, x_max, y_max) do
-    begin = m
+  def part_1_iterate_until_repeating(empty_seats, occupied_seats, x_max, y_max) do
+    begin = empty_seats
 
-    m =
-      Enum.map(m, fn {{x, y}, v} ->
+    {new_empty, new_occupied} =
+      for(
+        a <- 1..x_max,
+        b <- 1..y_max,
+        do: {a, b}
+      )
+      |> Enum.reduce({empty_seats, occupied_seats}, fn {x, y}, {new_empty, new_occupied} ->
         neighbours({x, y}, x_max, y_max)
-        |> count_taken_seats(m)
-        |> update_seat_value_part_1({x, y}, v)
+        |> count_taken_seats(occupied_seats)
+        |> update_seat_value_part_1({x, y}, new_empty, new_occupied)
       end)
-      |> Enum.into(%{})
 
-    if m == begin do
-      m
+    if begin == new_empty do
+      new_occupied
     else
-      part_1_iterate_until_repeating(m, x_max, y_max)
+      part_1_iterate_until_repeating(new_empty, new_occupied, x_max, y_max)
     end
   end
 
   def neighbours({x, y}, x_max, y_max) do
-    [
-      {x - 1, y - 1},
-      {x - 1, y},
-      {x - 1, y + 1},
-      {x, y - 1},
-      {x, y + 1},
-      {x + 1, y - 1},
-      {x + 1, y},
-      {x + 1, y + 1}
-    ]
-    |> Enum.filter(fn {x1, y1} -> not (x1 < 1 or x1 > x_max or y1 < 1 or y1 > y_max) end)
+    x1 = max(x - 1, 1)
+    x2 = min(x + 1, x_max)
+    y1 = max(y - 1, 1)
+    y2 = min(y + 1, y_max)
+    for xn <- x1..x2, yn <- y1..y2, {xn, yn} != {x, y}, do: {xn, yn}
   end
 
-  def part_2_iterate_until_repeating(m, x_max, y_max) do
-    begin = m
+  def nearest_neighbours({x, y}, x_max, y_max, _n) do
+    x1 = max(x - 1, 1)
+    x2 = min(x + 1, x_max)
+    y1 = max(y - 1, 1)
+    y2 = min(y + 1, y_max)
+    for xn <- x1..x2, yn <- y1..y2, {xn, yn} != {x, y}, do: {xn, yn}
+  end
 
-    m =
-      Enum.map(m, fn {{x, y}, v} ->
-        neighbours({x, y}, x_max, y_max)
-        |> count_taken_seats(m)
-        |> update_seat_value_part_1({x, y}, v)
+  def part_2_iterate_until_repeating(empty_seats, occupied_seats, x_max, y_max) do
+    begin = empty_seats
+
+    {new_empty, new_occupied} =
+      for(
+        a <- 1..x_max,
+        b <- 1..y_max,
+        do: {a, b}
+      )
+      |> Enum.reduce({empty_seats, occupied_seats}, fn {x, y}, {new_empty, new_occupied} ->
+        nearest_neighbours({x, y}, x_max, y_max, 1)
+        |> count_taken_seats(occupied_seats)
+        |> update_seat_value_part_2({x, y}, new_empty, new_occupied)
       end)
-      |> Enum.into(%{})
 
-    if m == begin do
-      m
+    if begin == new_empty do
+      new_occupied
     else
-      part_1_iterate_until_repeating(m, x_max, y_max)
+      part_2_iterate_until_repeating(new_empty, new_occupied, x_max, y_max)
     end
   end
 
-  def count_taken_seats(neighbours, seats) do
+  def count_taken_seats(neighbours, occupied_seats) do
     neighbours
-    |> Enum.count(fn n -> seats[n] == :O end)
+    |> Enum.count(&MapSet.member?(occupied_seats, &1))
   end
 
-  def update_seat_value_part_1(count, {x, y}, :L) when count == 0 do
-    {{x, y}, :O}
+  def update_seat_value_part_1(count, {x, y}, empty, occupied) when count == 0 do
+    if MapSet.member?(empty, {x, y}) do
+      {MapSet.delete(empty, {x, y}), MapSet.put(occupied, {x, y})}
+    else
+      {empty, occupied}
+    end
   end
 
-  def update_seat_value_part_1(count, {x, y}, :O) when count > 3 do
-    {{x, y}, :L}
+  def update_seat_value_part_1(count, {x, y}, empty, occupied) when count > 3 do
+    if MapSet.member?(occupied, {x, y}) do
+      {MapSet.put(empty, {x, y}), MapSet.delete(occupied, {x, y})}
+    else
+      {empty, occupied}
+    end
   end
 
-  def update_seat_value_part_1(_count, {x, y}, :.) do
-    {{x, y}, :.}
+  def update_seat_value_part_1(_count, _, empty, occupied) do
+    {empty, occupied}
   end
 
-  def update_seat_value_part_1(_count, {x, y}, v) do
-    {{x, y}, v}
+  def update_seat_value_part_2(count, {x, y}, empty, occupied) when count == 0 do
+    if MapSet.member?(empty, {x, y}) do
+      {MapSet.delete(empty, {x, y}), MapSet.put(occupied, {x, y})}
+    else
+      {empty, occupied}
+    end
+  end
+
+  def update_seat_value_part_2(count, {x, y}, empty, occupied) when count > 4 do
+    if MapSet.member?(occupied, {x, y}) do
+      {MapSet.put(empty, {x, y}), MapSet.delete(occupied, {x, y})}
+    else
+      {empty, occupied}
+    end
+  end
+
+  def update_seat_value_part_2(_count, _, empty, occupied) do
+    {empty, occupied}
+  end
+
+  def parse_input_to_coordinate_mapset(input, x, y) do
+    check = x * y + 1
+
+    {coords, ^check} =
+      input
+      |> String.split("", trim: true)
+      |> Enum.filter(&(&1 != "\n"))
+      |> Enum.reduce({MapSet.new(), 1}, fn item, {coords, n} ->
+        coords =
+          if item == "L" do
+            r = rem(n, x)
+            d = div(n, x)
+            x1 = if r != 0, do: r, else: x
+            y1 = if r != 0, do: d + 1, else: d
+            MapSet.put(coords, {x1, y1})
+          else
+            coords
+          end
+
+        {coords, n + 1}
+      end)
+
+    coords
   end
 end
