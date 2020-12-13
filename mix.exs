@@ -23,7 +23,8 @@ defmodule AdventOfCode2020.MixProject do
     [
       {:benchee, "~> 1.0"},
       {:flow, "~> 1.0"},
-      {:libgraph, "~> 0.7"}
+      {:libgraph, "~> 0.7"},
+      {:math, "~> 0.5.0"}
     ]
   end
 end
