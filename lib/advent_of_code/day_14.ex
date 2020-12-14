@@ -134,9 +134,10 @@ defmodule AdventOfCode.Day14 do
     |> Enum.reduce([0], fn {k, i}, acc ->
       case k do
         "X" ->
-          for b <- 0..1, s <- acc do
-            s + b * Math.pow(2, i)
+          for s <- acc do
+            [s + Math.pow(2, i), s]
           end
+          |> List.flatten()
 
         1 ->
           for s <- acc do
