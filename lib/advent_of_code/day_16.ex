@@ -7,7 +7,7 @@ defmodule AdventOfCode.Day16 do
     [rules_raw, tickets] = String.split(data, "\nyour ticket:\n", trim: true)
     rules = String.split(rules_raw, "\n", trim: true)
 
-    ranges = interpret_rules(rules) |> IO.inspect()
+    ranges = interpret_rules(rules)
     [_mine, others] = String.split(tickets, "\nnearby tickets:\n", trim: true)
     other_tickets = String.split(others, "\n", trim: true)
 
