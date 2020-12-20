@@ -17,14 +17,12 @@ defmodule AdventOfCode.Day11 do
   def part_1_iterate_until_repeating(empty_seats, occupied_seats, x_max, y_max) do
     begin = empty_seats
 
+    all_coordinates = for a <- 1..x_max, b <- 1..y_max, do: {a, b}
+
     {new_empty, new_occupied} =
-      for(
-        a <- 1..x_max,
-        b <- 1..y_max,
-        do: {a, b}
-      )
+      all_coordinates
       |> Enum.reduce({empty_seats, occupied_seats}, fn {x, y}, {new_empty, new_occupied} ->
-        neighbours({x, y}, x_max, y_max)
+        nearest_neighbours({x, y}, x_max, y_max, 1)
         |> count_taken_seats(occupied_seats)
         |> update_seat_value_part_1({x, y}, new_empty, new_occupied)
       end)
@@ -52,19 +50,63 @@ defmodule AdventOfCode.Day11 do
     for xn <- x1..x2, yn <- y1..y2, {xn, yn} != {x, y}, do: {xn, yn}
   end
 
+  def next_coordinate(:top, {x, y}, _x_max, y_max, n)
+      when y + n <= y_max do
+    {x, y + n}
+  end
+
+  def next_coordinate(:top_left, {x, y}, _x_max, y_max, n)
+      when x - n >= 1
+      when y + n <= y_max do
+    {x - n, y + n}
+  end
+
+  def next_coordinate(:top_right, {x, y}, x_max, y_max, n)
+      when x + n <= x_max
+      when y + n <= y_max do
+    {x - n, y + n}
+  end
+
+  def next_coordinate(:left, {x, y}, _x_max, _y_max, n)
+      when x - n >= 1 do
+    {x - n, y}
+  end
+
+  def next_coordinate(:right, {x, y}, x_max, _y_max, n)
+      when x + n <= x_max do
+    {x - n, y}
+  end
+
+  def next_coordinate(:bottom_left, {x, y}, _x_max, _y_max, n)
+      when x - n >= 1
+      when y - n >= 1 do
+    {x - n, y - n}
+  end
+
+  def next_coordinate(:bottom, {x, y}, _x_max, _y_max, n)
+      when y - n >= 1 do
+    {x, y - n}
+  end
+
+  def next_coordinate(:bottom_right, {x, y}, x_max, _y_max, n)
+      when y - n >= 1
+      when x + n <= x_max do
+    {x + n, y - n}
+  end
+
+  def next_coordinate(_, _, _, _, _) do
+    :halt
+  end
+
   def part_2_iterate_until_repeating(empty_seats, occupied_seats, x_max, y_max) do
     begin = empty_seats
 
+    all_seats = MapSet.union(empty_seats, occupied_seats) |> MapSet.to_list()
+
     {new_empty, new_occupied} =
-      for(
-        a <- 1..x_max,
-        b <- 1..y_max,
-        do: {a, b}
-      )
-      |> Enum.reduce({empty_seats, occupied_seats}, fn {x, y}, {new_empty, new_occupied} ->
-        nearest_neighbours({x, y}, x_max, y_max, 1)
-        |> count_taken_seats(occupied_seats)
-        |> update_seat_value_part_2({x, y}, new_empty, new_occupied)
+      all_seats
+      |> Enum.reduce({empty_seats, occupied_seats}, fn {_x, _y}, {new_empty, new_occupied} ->
+        {new_empty, new_occupied}
       end)
 
     if begin == new_empty do

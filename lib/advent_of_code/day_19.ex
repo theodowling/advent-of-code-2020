@@ -105,7 +105,7 @@ defmodule AdventOfCode.Day19 do
 
     rest11 = String.replace(rule11, rule8, "")
 
-    for i <- 1..3 do
+    for i <- 1..5 do
       rule =
         flatten_rule(r, "")
         |> String.replace(rule11, "rule11")
